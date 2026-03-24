@@ -1,72 +1,80 @@
 import { useState, useEffect } from "react";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PLACEHOLDERS = [
-   "yourstore.myshopify.com",
    "gymshark.com",
    "allbirds.com",
    "fashionnova.com",
+   "yourstore.myshopify.com",
 ];
 
 export default function AuditInput() {
    const [value, setValue] = useState("");
-   const [loading, setLoading] = useState(false);
-   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+   const [phIndex, setPhIndex] = useState(0);
+   const [phVisible, setPhVisible] = useState(true);
+   const navigate = useNavigate();
 
    useEffect(() => {
-      const interval = setInterval(() => {
-         setPlaceholderIndex((prev) => (prev + 1) % PLACEHOLDERS.length);
+      const t = setInterval(() => {
+         setPhVisible(false);
+         setTimeout(() => {
+            setPhIndex((p) => (p + 1) % PLACEHOLDERS.length);
+            setPhVisible(true);
+         }, 250);
       }, 2500);
-      return () => clearInterval(interval);
+      return () => clearInterval(t);
    }, []);
 
    const handleSubmit = (e) => {
       e.preventDefault();
       if (!value.trim()) return;
-      setLoading(true);
-      setTimeout(() => setLoading(false), 2000);
+      let url = value.trim();
+      if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+      navigate(`/dashboard?url=${encodeURIComponent(url)}`);
    };
 
    return (
-      <form onSubmit={handleSubmit} className="mt-10 w-full max-w-2xl mx-auto">
-         <div className="flex items-center rounded-2xl border border-gray-200 bg-white/90 p-2 shadow-xl shadow-gray-100/60 backdrop-blur-sm focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-100 transition-all duration-300">
-            {/* Globe icon */}
-            <div className="pl-3 pr-2 text-gray-400">
+      <form onSubmit={handleSubmit} className="w-full">
+         <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg shadow-gray-100/80 transition-all duration-300 focus-within:border-emerald-400 focus-within:shadow-emerald-50 focus-within:ring-2 focus-within:ring-emerald-100">
+            <div className="flex-shrink-0 pl-3 pr-1 text-gray-300">
                <svg
-                  xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
-                  fill="none"
                   viewBox="0 0 24 24"
+                  fill="none"
                   stroke="currentColor"
-                  strokeWidth={1.8}
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
                >
                   <circle cx="12" cy="12" r="10" />
-                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z" />
                </svg>
             </div>
             <input
                type="text"
                value={value}
                onChange={(e) => setValue(e.target.value)}
-               placeholder={PLACEHOLDERS[placeholderIndex]}
-               className="flex-1 bg-transparent py-3 text-base text-gray-800 placeholder:text-gray-400 outline-none"
+               placeholder={phVisible ? PLACEHOLDERS[phIndex] : ""}
+               className="min-w-0 flex-1 bg-transparent py-3 text-[15px] text-gray-800 placeholder:text-gray-300 outline-none"
             />
             <button
                type="submit"
-               disabled={loading}
-               className="flex items-center gap-2 rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-emerald-600 hover:scale-[1.02] active:scale-95 disabled:opacity-70 cursor-pointer"
+               className="flex-shrink-0 flex items-center gap-2 rounded-xl bg-gray-900 px-6 py-3 text-[14px] font-bold text-white transition-all duration-200 hover:bg-emerald-600 active:scale-95"
             >
-               {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-               ) : (
-                  <>
-                     Get Audit <ArrowRight className="h-4 w-4" />
-                  </>
-               )}
+               Get Audit
+               <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+               >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+               </svg>
             </button>
          </div>
-         <p className="mt-2.5 text-center text-xs text-gray-400">
-            Free audit • No credit card required • Results in &lt;60 seconds
+         <p className="mt-3 text-center text-[12px] text-gray-400">
+            Paste any Shopify store URL above — results delivered instantly
          </p>
       </form>
    );

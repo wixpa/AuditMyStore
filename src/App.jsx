@@ -1,26 +1,13 @@
-import Header from "./components/header/Header";
-import HeroSection from "./components/hero/HeroSection";
-import HowItWorksSection from "./components/how-it-works/HowItWorksSection";
-import WhatCanFixSection from "./components/what-can-fix/WhatCanFixSection";
-import WhoIsItForSection from "./components/who-is-it-for/WhoIsItForSection";
-import WhoWeAreSection from "./components/who-we-are/WhoWeAreSection";
-import FaqSection from "./components/faq/FaqSection";
-import Footer from "./components/footer/Footer";
+import { Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage.jsx";
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
    return (
-      <>
-         <Header />
-         <main>
-            <HeroSection />
-            <HowItWorksSection />
-            <WhatCanFixSection />
-            <WhoIsItForSection />
-            <WhoWeAreSection />
-            <FaqSection />
-            <Footer />
-         </main>
-      </>
+      <Routes>
+         <Route path="/" element={<HomePage />} />
+         <Route path="/dashboard" element={<DashboardPage />} />
+      </Routes>
    );
 }
 
