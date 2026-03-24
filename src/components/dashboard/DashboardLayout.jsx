@@ -10,15 +10,10 @@ import MetricsRow from "./MetricsRow";
 import useAudit from "../../hooks/useAudit";
 
 const AI_BADGE = {
-   openai: {
-      label: "Powered by GPT-4o Mini",
-      icon: "✦",
-      cls: "bg-emerald-50 text-emerald-700 border-emerald-200",
-   },
-   gemini: {
-      label: "Powered by Gemini 2.0 Flash",
-      icon: "✦",
-      cls: "bg-sky-50 text-sky-700 border-sky-200",
+   huggingface: {
+      label: "Powered by GLM‑5 via Hugging Face",
+      icon: "🤝",
+      cls: "bg-purple-50 text-purple-700 border-purple-200",
    },
 };
 
@@ -58,14 +53,14 @@ export default function DashboardLayout({ storeUrl }) {
 
                {data && !loading && (
                   <div className="mx-auto max-w-5xl space-y-6">
-                     {/* Page title */}
+                     {/* Heading row */}
                      <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
-                           <div className="flex flex-wrap items-center gap-3 mb-1">
+                           <div className="mb-1 flex flex-wrap items-center gap-3">
                               <h1 className="text-2xl font-black text-gray-900">
                                  {activeAudit} Audit Overview
                               </h1>
-                              {/* AI source badge */}
+
                               {aiSource && AI_BADGE[aiSource] && (
                                  <span
                                     className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 text-[11px] font-bold ${AI_BADGE[aiSource].cls}`}
@@ -95,7 +90,6 @@ export default function DashboardLayout({ storeUrl }) {
                            )}
                         </div>
 
-                        {/* Re-run */}
                         <button
                            onClick={rerun}
                            className="flex-shrink-0 flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-bold text-gray-600 shadow-sm transition hover:border-emerald-300 hover:text-emerald-600"
@@ -115,7 +109,7 @@ export default function DashboardLayout({ storeUrl }) {
                         </button>
                      </div>
 
-                     {/* Overview stat cards */}
+                     {/* Stat cards */}
                      <AuditOverview data={data} />
 
                      {/* Core Web Vitals */}
@@ -153,7 +147,7 @@ export default function DashboardLayout({ storeUrl }) {
                      {/* Upsell banner */}
                      <UpsellBanner />
 
-                     {/* Detailed AI report */}
+                     {/* Detailed report */}
                      <DetailedReport problems={data.problems} />
                   </div>
                )}

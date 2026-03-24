@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
-const OPENAI_API_KEY =
-   "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";
-const GEMINI_API_KEY = "AIzaSyBZ3LP3R7NV7wKT9ispXdlwMY__ESw3Ewo";
-
-const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+const HF_TOKEN = "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";
+const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 
 export function scoreColor(val) {
    if (val >= 80) return "emerald";
@@ -19,6 +15,8 @@ function buildPrompt(storeUrl) {
 You are a world-class Shopify CRO, SEO, and performance expert. Perform a full audit of this Shopify store:
 
 Store URL: ${storeUrl}
+
+You cannot actually crawl the site, but you must infer realistic issues for a modern Shopify store in this niche, based on common patterns you have seen.
 
 Based on your expert knowledge of Shopify stores, common CRO issues, SEO best practices, page speed problems, mobile UX issues, and app performance risks — generate a comprehensive, realistic, and highly specific audit report.
 
@@ -58,106 +56,69 @@ Required JSON structure:
 
 Rules:
 - Generate exactly 7 problems covering different categories
-- Be highly specific to this exact store brand, niche, and product type
+- Be highly specific to this exact store brand, niche, and product type (infer from the URL and typical Shopify brands)
 - Severity must be realistic — not everything is high
-- Performance scores: most Shopify stores score 45-75 realistically
+- Performance scores: most Shopify stores realistically score 45-75 on performance
 - Metrics should be realistic estimates for a Shopify store of this type
 - Raw JSON only — no markdown, no code fences
 `;
 }
 
-/* ── OpenAI request ── */
-async function fetchOpenAI(storeUrl) {
-   const res = await fetch(OPENAI_URL, {
+/* ── HuggingFace Router request ── */
+async function fetchHuggingFace(storeUrl) {
+   const body = {
+      model: "zai-org/GLM-5:novita",
+      messages: [
+         {
+            role: "system",
+            content:
+               "You are a world-class Shopify CRO and SEO consultant. Always respond with raw JSON only — no markdown, no code fences.",
+         },
+         {
+            role: "user",
+            content: buildPrompt(storeUrl),
+         },
+      ],
+      temperature: 0.5,
+      max_tokens: 3000,
+   };
+
+   const response = await fetch(HF_URL, {
       method: "POST",
       headers: {
+         Authorization: `Bearer ${HF_TOKEN}`,
          "Content-Type": "application/json",
-         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
-      body: JSON.stringify({
-         model: "gpt-4o-mini",
-         messages: [
-            {
-               role: "system",
-               content:
-                  "You are a world-class Shopify CRO and SEO consultant. Always respond with raw JSON only — no markdown, no code fences.",
-            },
-            {
-               role: "user",
-               content: buildPrompt(storeUrl),
-            },
-         ],
-         temperature: 0.5,
-         max_tokens: 3000,
-         response_format: { type: "json_object" },
-      }),
+      body: JSON.stringify(body),
    });
 
-   if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`OpenAI error ${res.status}: ${err}`);
+   if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`HuggingFace error ${response.status}: ${err}`);
    }
 
-   const json = await res.json();
-   const raw = json?.choices?.[0]?.message?.content ?? "";
-   return JSON.parse(raw);
-}
+   const result = await response.json();
 
-/* ── Gemini request ── */
-async function fetchGemini(storeUrl) {
-   const res = await fetch(GEMINI_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-         contents: [{ parts: [{ text: buildPrompt(storeUrl) }] }],
-         generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 3000,
-            responseMimeType: "application/json",
-         },
-      }),
-   });
+   // HF router uses OpenAI-like structure
+   const raw =
+      result?.choices?.[0]?.message?.content ??
+      result?.choices?.[0]?.message?.[0]?.content ??
+      "";
 
-   if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`Gemini error ${res.status}: ${err}`);
-   }
-
-   const json = await res.json();
-   const raw = json?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
    const cleaned = raw
       .replace(/^```json\s*/i, "")
       .replace(/^```\s*/i, "")
       .replace(/```$/i, "")
       .trim();
+
    return JSON.parse(cleaned);
 }
 
-/* ── Try OpenAI first, fallback to Gemini ── */
-async function fetchAudit(storeUrl, onSourceDetected) {
-   try {
-      const data = await fetchOpenAI(storeUrl);
-      onSourceDetected("openai");
-      return data;
-   } catch (openAiErr) {
-      console.warn("OpenAI failed, falling back to Gemini:", openAiErr.message);
-      try {
-         const data = await fetchGemini(storeUrl);
-         onSourceDetected("gemini");
-         return data;
-      } catch (geminiErr) {
-         throw new Error(
-            `Both APIs failed. OpenAI: ${openAiErr.message} | Gemini: ${geminiErr.message}`,
-         );
-      }
-   }
-}
-
-/* ── Parse & normalize report ── */
-function normalizeReport(raw, url, aiSource) {
+/* ── Normalize into dashboard-friendly shape ── */
+function normalizeReport(raw, url) {
    return {
       url,
-      aiSource,
+      aiSource: "huggingface",
       overallScore: raw.overallScore ?? 60,
       summary: raw.summary ?? "",
       scores: {
@@ -191,32 +152,30 @@ export default function useAudit(storeUrl) {
    const [data, setData] = useState(null);
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
-   const [strategy, setStrategy] = useState("mobile");
+   const [strategy, setStrategy] = useState("mobile"); // still used for UI toggle
    const [step, setStep] = useState(0);
-   const [aiSource, setAiSource] = useState(null); // "openai" | "gemini"
    const ranRef = useRef(false);
 
-   const run = async (url, strat) => {
+   const run = async (url) => {
       if (!url) return;
       setLoading(true);
       setError(null);
       setData(null);
-      setAiSource(null);
 
       try {
-         setStep(1);
-         await new Promise((r) => setTimeout(r, 500));
+         setStep(1); // connecting
+         await new Promise((r) => setTimeout(r, 400));
 
-         setStep(2);
-         await new Promise((r) => setTimeout(r, 500));
+         setStep(2); // analyzing
+         await new Promise((r) => setTimeout(r, 400));
 
-         setStep(3);
-         const raw = await fetchAudit(url, setAiSource);
+         setStep(3); // HF model thinking
+         const raw = await fetchHuggingFace(url);
 
-         setStep(4);
+         setStep(4); // building report
          await new Promise((r) => setTimeout(r, 300));
 
-         setData(normalizeReport(raw, url, aiSource));
+         setData(normalizeReport(raw, url));
          setStep(5);
       } catch (err) {
          setError(err.message || "Audit failed. Please try again.");
@@ -229,13 +188,13 @@ export default function useAudit(storeUrl) {
    useEffect(() => {
       if (ranRef.current) return;
       ranRef.current = true;
-      if (storeUrl) run(storeUrl, strategy);
+      if (storeUrl) run(storeUrl);
    }, [storeUrl]);
 
    const handleStrategyChange = (s) => {
       setStrategy(s);
       ranRef.current = false;
-      run(storeUrl, s);
+      run(storeUrl);
    };
 
    return {
@@ -243,12 +202,12 @@ export default function useAudit(storeUrl) {
       loading,
       error,
       strategy,
-      aiSource,
+      aiSource: "huggingface",
       setStrategy: handleStrategyChange,
       step,
       rerun: () => {
          ranRef.current = false;
-         run(storeUrl, strategy);
+         run(storeUrl);
       },
    };
 }
