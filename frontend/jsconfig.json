@@ -1,0 +1,12 @@
+{
+   "compilerOptions": {
+      // ... other options
+      "baseUrl": ".",
+      "paths": {
+         "@/*": ["./src/*"],
+         "@components/*": ["./src/components/*"]
+         // Add more paths corresponding to your aliases
+      }
+   }
+   // ... other configurations (like "include" and "references")
+}
