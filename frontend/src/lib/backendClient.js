@@ -1,8 +1,6 @@
-const DEFAULT_API_BASE_URL = "http://localhost:4000";
-
 export function getApiBaseUrl() {
   // Vite exposes env vars starting with VITE_*
-  return import.meta.env?.VITE_API_BASE_URL || DEFAULT_API_BASE_URL;
+  return import.meta.env?.VITE_API_BASE_URL;
 }
 
 async function fetchJson(url, options = {}, timeoutMs = 4000) {
