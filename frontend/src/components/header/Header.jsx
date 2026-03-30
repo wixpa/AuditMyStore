@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import FreeToolsDropdown from "./FreeToolsDropdown";
 import MobileMenu from "./MobileMenu";
 
 const navLinks = [
    { label: "Home", to: "/" },
-   { label: "Shopify Apps", to: "#" },
-   { label: "Shopify Stores", to: "#" },
-   { label: "Shopify Flow", to: "#" },
+   { label: "Shopify Apps", to: "/shopify-apps" },
+   { label: "Shopify Stores", to: "/shopify-stores" },
    { label: "Pricing", to: "/pricing" },
 ];
 
@@ -16,10 +14,8 @@ export default function Header() {
    const { isAuthenticated, user, logout } = useAuth();
    const location = useLocation();
    const [scrolled, setScrolled] = useState(false);
-   const [dropdownOpen, setDropdownOpen] = useState(false);
    const [mobileOpen, setMobileOpen] = useState(false);
    const [userMenuOpen, setUserMenuOpen] = useState(false);
-   const dropdownRef = useRef(null);
    const userMenuRef = useRef(null);
 
    const activeLink = navLinks.find((l) => l.to === location.pathname)?.label || "";
@@ -30,12 +26,9 @@ export default function Header() {
       return () => window.removeEventListener("scroll", onScroll);
    }, []);
 
-   // Close dropdowns on outside click
+   // Close user menu on outside click
    useEffect(() => {
       const handler = (e) => {
-         if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-            setDropdownOpen(false);
-         }
          if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
             setUserMenuOpen(false);
          }
@@ -66,14 +59,10 @@ export default function Header() {
                <nav className="hidden md:flex items-center gap-1">
                   {navLinks.map((link) => {
                      const isActive = activeLink === link.label;
-                     const isHash = link.to === "#";
-                     const Comp = isHash ? "a" : Link;
-                     const linkProps = isHash ? { href: "#" } : { to: link.to };
-
                      return (
-                        <Comp
+                        <Link
                            key={link.label}
-                           {...linkProps}
+                           to={link.to}
                            className={`relative px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200
                            ${
                               isActive
@@ -85,39 +74,9 @@ export default function Header() {
                            {isActive && (
                               <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-emerald-500" />
                            )}
-                        </Comp>
+                        </Link>
                      );
                   })}
-
-                  {/* Free Tools dropdown */}
-                  <div ref={dropdownRef} className="relative">
-                     <button
-                        onClick={() => setDropdownOpen(!dropdownOpen)}
-                        className={`flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200
-                        ${
-                           dropdownOpen
-                              ? "text-emerald-600 bg-emerald-50"
-                              : "text-gray-600 hover:text-gray-900 hover:bg-gray-100/70"
-                        }`}
-                     >
-                        Free Tools
-                        <svg
-                           className={`h-3.5 w-3.5 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
-                           viewBox="0 0 24 24"
-                           fill="none"
-                           stroke="currentColor"
-                           strokeWidth="2.5"
-                           strokeLinecap="round"
-                        >
-                           <path d="M6 9l6 6 6-6" />
-                        </svg>
-                     </button>
-
-                     <FreeToolsDropdown
-                        open={dropdownOpen}
-                        onClose={() => setDropdownOpen(false)}
-                     />
-                  </div>
                </nav>
 
                {/* ── RIGHT SIDE ── */}

@@ -1,26 +1,28 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const quickLinks = [
-   { label: "Home", href: "#" },
-   { label: "Pricing", href: "#" },
-   { label: "For Agencies", href: "#" },
-   { label: "Contact Us", href: "#" },
-   { label: "Blogs", href: "#" },
+   { label: "Home", to: "/" },
+   { label: "Pricing", to: "/pricing" },
+   { label: "Contact", to: "/contact" },
 ];
 
 const auditLinks = [
-   { label: "Product Page Audit", href: "#" },
-   { label: "Cart Page Audit", href: "#" },
-   { label: "Collection Page Audit", href: "#" },
-   { label: "AI SEO Audit", href: "#" },
-   { label: "Page Speed Audit", href: "#" },
+   { label: "Product Page Audit", page: "Product Page" },
+   { label: "Cart Page Audit", page: "Cart Page" },
+   { label: "Collection Page Audit", page: "Collection Page" },
+   { label: "AI SEO Audit", page: "AI SEO" },
+   { label: "Page Speed Audit", page: "Page Speed" },
 ];
 
-const toolLinks = [
-   { label: "AI Visibility Checker", href: "#" },
-   { label: "LLM.txt Generator", href: "#" },
-   { label: "Robots.txt Generator", href: "#" },
-   { label: "Schema Markup Tool", href: "#" },
+const UPWORK_URL = "https://www.upwork.com/freelancers/malikzeeshanhaider";
+
+const hiringLinks = [
+   { label: "Shopify Developer" },
+   { label: "Customizer" },
+   { label: "Design Redesign" },
+   { label: "CRO" },
 ];
 
 /* ── All social icons as pure SVGs ── */
@@ -105,6 +107,8 @@ const socials = [
 export default function Footer() {
    const [email, setEmail] = useState("");
    const [submitted, setSubmitted] = useState(false);
+   const { isAuthenticated } = useAuth();
+   const navigate = useNavigate();
 
    const handleSubscribe = (e) => {
       e.preventDefault();
@@ -112,6 +116,15 @@ export default function Footer() {
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 3000);
       setEmail("");
+   };
+
+   const handleAuditClick = (pageName) => {
+      if (isAuthenticated) {
+         navigate(`/dashboard?autostart=1&page=${encodeURIComponent(pageName)}`);
+      } else {
+         const next = `/dashboard?autostart=1&page=${encodeURIComponent(pageName)}`;
+         navigate(`/login?next=${encodeURIComponent(next)}`);
+      }
    };
 
    return (
@@ -242,27 +255,72 @@ export default function Footer() {
                   </div>
                </div>
 
-               {/* ── LINK COLUMNS ── */}
-               <FooterLinkCol
-                  title="Quick Links"
-                  links={quickLinks}
-                  accentColor="text-emerald-400"
-               />
-               <FooterLinkCol
-                  title="Audit Links"
-                  links={auditLinks}
-                  accentColor="text-sky-400"
-               />
-               <FooterLinkCol
-                  title="Tools"
-                  links={toolLinks}
-                  accentColor="text-violet-400"
-               />
+               {/* ── QUICK LINKS ── */}
+               <div className="flex flex-col gap-4">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.15em] text-emerald-400">
+                     Quick Links
+                  </h4>
+                  <ul className="flex flex-col gap-3">
+                     {quickLinks.map((link, i) => (
+                        <li key={i}>
+                           <Link
+                              to={link.to}
+                              className="group relative inline-flex items-center text-sm text-gray-400 transition-colors duration-200 hover:text-white no-underline"
+                           >
+                              <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-emerald-400 to-transparent transition-all duration-300 group-hover:w-full" />
+                              {link.label}
+                           </Link>
+                        </li>
+                     ))}
+                  </ul>
+               </div>
+
+               {/* ── AUDIT LINKS ── */}
+               <div className="flex flex-col gap-4">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.15em] text-sky-400">
+                     Audit Links
+                  </h4>
+                  <ul className="flex flex-col gap-3">
+                     {auditLinks.map((link, i) => (
+                        <li key={i}>
+                           <button
+                              onClick={() => handleAuditClick(link.page)}
+                              className="group relative inline-flex items-center text-sm text-gray-400 transition-colors duration-200 hover:text-white bg-transparent border-none cursor-pointer p-0"
+                           >
+                              <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-sky-400 to-transparent transition-all duration-300 group-hover:w-full" />
+                              {link.label}
+                           </button>
+                        </li>
+                     ))}
+                  </ul>
+               </div>
+
+               {/* ── HIRING ── */}
+               <div className="flex flex-col gap-4">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.15em] text-violet-400">
+                     Hiring
+                  </h4>
+                  <ul className="flex flex-col gap-3">
+                     {hiringLinks.map((link, i) => (
+                        <li key={i}>
+                           <a
+                              href={UPWORK_URL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group relative inline-flex items-center text-sm text-gray-400 transition-colors duration-200 hover:text-white no-underline"
+                           >
+                              <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-violet-400 to-transparent transition-all duration-300 group-hover:w-full" />
+                              {link.label}
+                           </a>
+                        </li>
+                     ))}
+                  </ul>
+               </div>
             </div>
 
             {/* ── FEATURED BADGE ── */}
             <div className="flex justify-center pb-10">
-               <div className="group relative inline-flex items-center gap-3 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 shadow-lg shadow-emerald-900/20 backdrop-blur-sm transition-all duration-300 hover:bg-emerald-400/15 hover:scale-105 cursor-pointer">
+               <div className="group relative  inline-flex items-center gap-3 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 shadow-lg shadow-emerald-900/20 backdrop-blur-sm transition-all duration-300 hover:bg-emerald-400/15 hover:scale-105 cursor-pointer overflow-hidden">
                   <span className="relative flex h-3 w-3">
                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
                      <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
@@ -329,31 +387,5 @@ export default function Footer() {
             </div>
          </div>
       </footer>
-   );
-}
-
-/* ── Reusable link column ── */
-function FooterLinkCol({ title, links, accentColor }) {
-   return (
-      <div className="flex flex-col gap-4">
-         <h4
-            className={`text-[11px] font-black uppercase tracking-[0.15em] ${accentColor}`}
-         >
-            {title}
-         </h4>
-         <ul className="flex flex-col gap-3">
-            {links.map((link, i) => (
-               <li key={i}>
-                  <a
-                     href={link.href}
-                     className="group relative inline-flex items-center text-sm text-gray-400 transition-colors duration-200 hover:text-white"
-                  >
-                     <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-emerald-400 to-transparent transition-all duration-300 group-hover:w-full" />
-                     {link.label}
-                  </a>
-               </li>
-            ))}
-         </ul>
-      </div>
    );
 }

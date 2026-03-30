@@ -1,12 +1,5 @@
 import { Link } from "react-router-dom";
 
-const mobileTools = [
-   { label: "AI Visibility Checker", emoji: "🔍" },
-   { label: "LLM.txt Generator", emoji: "📄" },
-   { label: "Robots.txt Generator", emoji: "🤖" },
-   { label: "Page Speed Tester", emoji: "⚡" },
-];
-
 export default function MobileMenu({
    open,
    onClose,
@@ -56,47 +49,23 @@ export default function MobileMenu({
 
             {/* Nav links */}
             <div className="flex flex-col gap-1 px-3 py-4">
-               {navLinks.map((link) => {
-                  const isHash = link.to === "#";
-                  const Comp = isHash ? "a" : Link;
-                  const linkProps = isHash ? { href: "#" } : { to: link.to };
-
-                  return (
-                     <Comp
-                        key={link.label}
-                        {...linkProps}
-                        onClick={onClose}
-                        className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
-                           activeLink === link.label
-                              ? "bg-emerald-50 text-emerald-600"
-                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                        }`}
-                     >
-                        {activeLink === link.label && (
-                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-                        )}
-                        {link.label}
-                     </Comp>
-                  );
-               })}
-
-               {/* Free Tools section */}
-               <div className="mt-2 border-t border-gray-100 pt-3">
-                  <p className="mb-2 px-4 text-[10px] font-black uppercase tracking-widest text-gray-400">
-                     Free Tools
-                  </p>
-                  {mobileTools.map((tool, i) => (
-                     <a
-                        key={i}
-                        href="#"
-                        onClick={onClose}
-                        className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-all"
-                     >
-                        <span>{tool.emoji}</span>
-                        {tool.label}
-                     </a>
-                  ))}
-               </div>
+               {navLinks.map((link) => (
+                  <Link
+                     key={link.label}
+                     to={link.to}
+                     onClick={onClose}
+                     className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
+                        activeLink === link.label
+                           ? "bg-emerald-50 text-emerald-600"
+                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                     }`}
+                  >
+                     {activeLink === link.label && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                     )}
+                     {link.label}
+                  </Link>
+               ))}
             </div>
 
             {/* Bottom CTA */}

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import { PRICING_TIERS, getDisplayPrice } from "../lib/pricingLogic";
-import { Check, Sparkles, Zap, Building2, ArrowRight } from "lucide-react";
+import { Check, Sparkles, Zap, Building2, ArrowRight, Shield, MessageCircle } from "lucide-react";
 
 const TIER_ICONS = {
    starter: Zap,
@@ -206,15 +206,20 @@ export default function PricingPage() {
                   <div className="mt-16 text-center">
                      <div className="mx-auto flex max-w-lg flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-2xl border border-gray-200/60 bg-white/60 px-8 py-5 shadow-sm backdrop-blur-sm">
                         {[
-                           { emoji: "🔒", text: "No credit card required" },
-                           { emoji: "⚡", text: "Cancel anytime" },
-                           { emoji: "💬", text: "Priority support" },
-                        ].map((item, i) => (
-                           <span key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                              <span>{item.emoji}</span>
-                              <span className="font-medium">{item.text}</span>
-                           </span>
-                        ))}
+                           { icon: Shield, text: "No credit card required", color: "text-emerald-500", bg: "bg-emerald-50" },
+                           { icon: Zap, text: "Cancel anytime", color: "text-amber-500", bg: "bg-amber-50" },
+                           { icon: MessageCircle, text: "Priority support", color: "text-sky-500", bg: "bg-sky-50" },
+                        ].map((item, i) => {
+                           const Icon = item.icon;
+                           return (
+                              <span key={i} className="flex items-center gap-2.5 text-sm text-gray-600">
+                                 <span className={`flex h-8 w-8 items-center justify-center rounded-full ${item.bg}`}>
+                                    <Icon className={`h-4 w-4 ${item.color}`} strokeWidth={2} />
+                                 </span>
+                                 <span className="font-medium">{item.text}</span>
+                              </span>
+                           );
+                        })}
                      </div>
                   </div>
                </div>
