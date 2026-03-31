@@ -10,6 +10,7 @@ import MetricsRow from "./MetricsRow";
 import useAudit from "../../hooks/useAudit";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import StickyCtaButton from "../who-we-are/StickyCtaButton";
 import {
    getAnonAuditUsed,
    getUserAuditRemaining,
@@ -383,6 +384,7 @@ export default function DashboardLayout({ storeUrl, autoStart = false, initialPa
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f8fafb]">
+      <StickyCtaButton forceVisible />
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div

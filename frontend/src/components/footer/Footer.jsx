@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useHireModal } from "../../context/HireModalContext";
 
 const quickLinks = [
    { label: "Home", to: "/" },
@@ -16,7 +17,8 @@ const auditLinks = [
    { label: "Page Speed Audit", page: "Page Speed" },
 ];
 
-const UPWORK_URL = "https://www.upwork.com/freelancers/malikzeeshanhaider";
+// Upwork fallback kept for reference
+// const UPWORK_URL = "https://www.upwork.com/freelancers/malikzeeshanhaider";
 
 const hiringLinks = [
    { label: "Shopify Developer" },
@@ -109,6 +111,7 @@ export default function Footer() {
    const [submitted, setSubmitted] = useState(false);
    const { isAuthenticated } = useAuth();
    const navigate = useNavigate();
+   const { openHireModal } = useHireModal();
 
    const handleSubscribe = (e) => {
       e.preventDefault();
@@ -303,15 +306,13 @@ export default function Footer() {
                   <ul className="flex flex-col gap-3">
                      {hiringLinks.map((link, i) => (
                         <li key={i}>
-                           <a
-                              href={UPWORK_URL}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="group relative inline-flex items-center text-sm text-gray-400 transition-colors duration-200 hover:text-white no-underline"
+                           <button
+                              onClick={openHireModal}
+                              className="group relative inline-flex items-center text-sm text-gray-400 transition-colors duration-200 hover:text-white bg-transparent border-none cursor-pointer p-0"
                            >
                               <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-gradient-to-r from-violet-400 to-transparent transition-all duration-300 group-hover:w-full" />
                               {link.label}
-                           </a>
+                           </button>
                         </li>
                      ))}
                   </ul>

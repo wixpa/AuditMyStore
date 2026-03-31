@@ -8,6 +8,7 @@ import SignupPage from "./pages/SignupPage";
 import ShopifyAppsPage from "./pages/ShopifyAppsPage";
 import ShopifyStoresPage from "./pages/ShopifyStoresPage";
 import ContactPage from "./pages/ContactPage";
+import HireFormModal from "./components/hire-modal/HireFormModal";
 
 function ScrollToTop() {
    const { pathname } = useLocation();
@@ -31,6 +32,9 @@ function App() {
             <Route path="/shopify-stores" element={<ShopifyStoresPage />} />
             <Route path="/contact" element={<ContactPage />} />
          </Routes>
+
+         {/* Global hire modal — triggered from footer & contact page */}
+         <HireFormModal />
       </>
    );
 }

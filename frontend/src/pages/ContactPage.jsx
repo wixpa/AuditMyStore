@@ -2,11 +2,13 @@ import { useState } from "react";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
 import { Send, Mail, MapPin, Clock, CheckCircle } from "lucide-react";
+import { useHireModal } from "../context/HireModalContext";
 
 export default function ContactPage() {
    const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
    const [submitted, setSubmitted] = useState(false);
    const [sending, setSending] = useState(false);
+   const { openHireModal } = useHireModal();
 
    const handleChange = (e) => {
       setForm({ ...form, [e.target.name]: e.target.value });
@@ -127,28 +129,24 @@ export default function ContactPage() {
                         })}
 
                         {/* Hire CTA */}
-                        <a
-                           href="https://www.upwork.com/freelancers/malikzeeshanhaider"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           className="group flex items-center gap-3 rounded-2xl bg-gray-900 p-6 text-white shadow-lg transition-all duration-200 hover:bg-emerald-600 hover:scale-[1.02] active:scale-[0.98] no-underline"
+                        <button
+                           onClick={openHireModal}
+                           className="group flex w-full items-center gap-3 rounded-2xl bg-gray-900 p-6 text-white shadow-lg transition-all duration-200 hover:bg-emerald-600 hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
                         >
                            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/10">
                               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                 <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v2" />
-                                 <circle cx="9" cy="7" r="4" />
-                                 <path d="M22 21v-2a4 4 0 00-3-3.87" />
-                                 <path d="M16 3.13a4 4 0 010 7.75" />
+                                 <line x1="22" y1="2" x2="11" y2="13" />
+                                 <polygon points="22 2 15 22 11 13 2 9 22 2" />
                               </svg>
                            </div>
-                           <div>
-                              <p className="text-sm font-bold">Hire Us on Upwork</p>
-                              <p className="text-xs text-white/60">Shopify Development & Customization</p>
+                           <div className="text-left">
+                              <p className="text-sm font-bold">Get Expert Help</p>
+                              <p className="text-xs text-white/60">Shopify Development & Optimization</p>
                            </div>
                            <svg className="ml-auto h-5 w-5 text-white/40 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                               <path d="M5 12h14M12 5l7 7-7 7" />
                            </svg>
-                        </a>
+                        </button>
                      </div>
 
                      {/* Contact Form */}
